@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import PostForm from "./components/PostForm";
 import PostList from "./components/PostList";
 import MyButton from "./components/UI/button/MyButton";
+import MyInput from "./components/UI/input/MyInput";
+import MySelect from "./components/UI/select/MySelect";
 import "./styles/App.css";
 
 const App = () => {
@@ -22,14 +25,45 @@ const App = () => {
     },
   ]);
 
+  const [selectedSort, setSelectedSort] = useState("");
+
+  const createPost = (newPost) => {
+    setPosts([...posts, newPost]);
+  };
+
+  const removePost = (post) => {
+    setPosts(posts.filter((p) => p.id !== post.id));
+  };
+
+  const sortPosts = (sort) => {
+    selectedSort(sort);
+    setPosts([...posts].sort((a, b) => a[sort].localeCompare(b[sort])));
+  };
+
   return (
     <div className="App">
-      <form>
-        <input type="text" placeholder="Name of post" />
-        <input type="text" placeholder="Description of post" />
-        <MyButton>Create post</MyButton>
-      </form>
-      <PostList posts={posts} title="Posts about crypto" />
+      <PostForm create={createPost} />
+      <hr style={{ margin: "15 px 0" }} />
+      <div>
+        <MySelect
+          value={selectedSort}
+          onChange={sortPosts}
+          defaultValue="Sorting"
+          options={[
+            { value: "title", name: "By name" },
+            { value: "body", name: "By description" },
+          ]}
+        />
+      </div>
+      {posts.length ? (
+        <PostList
+          remove={removePost}
+          posts={posts}
+          title="Posts about crypto"
+        />
+      ) : (
+        <h1 style={{ textAlign: "center" }}>Posts weren't found</h1>
+      )}
     </div>
   );
 };
